@@ -13,21 +13,27 @@ class IterativeSolver<Domain, Node> constructor(
         inFlow = LinkedHashMap()
         outFlow = LinkedHashMap()
     }
+
     override fun solveFixedPoint(cfg: DirectedGraph<Node>) {
         var changed = false
-        for (node in cfg) {
-            if (cfg.heads.contains(node)) {
-                val inVar = inFlow[node]
-            } else {
-                val inVar = cfg.getPredsOf(node).asSequence()
-                    .map {
-                        outFlow[it]
-                    }
-                    .reduce { acc, domain ->
-                        analysis.newInitialFlow()
-                    }
-
+        do {
+            for (node in cfg) {
+                val inVar =
+                        if (cfg.heads.contains(node)) {
+                            inFlow[node]
+                        } else {
+                            cfg.getPredsOf(node).asSequence()
+                                    .map {
+                                        outFlow[it]
+                                    }
+                                    .reduce { acc, domain ->
+                                        analysis.meet(acc!!, domain!!)
+                                    }
+                        }
+                inFlow[node] = inVar!!
+                val outVar = outFlow[node]
+                changed = changed or analysis.transfer(node, inVar, outVar!!)
             }
-        }
+        }while (changed)
     }
 }

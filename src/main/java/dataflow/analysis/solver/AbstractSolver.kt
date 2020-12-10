@@ -22,14 +22,14 @@ abstract class AbstractSolver<Domain, Node> constructor(
         solveFixedPoint(cfg)
     }
 
-    fun getBeforeFlow() =
+    val beforeFlow =
         if (analysis.isForward()) {
             inFlow
         } else {
             outFlow
         }
 
-    fun getAfterFlow() =
+    val afterFlow =
         if (analysis.isForward()) {
             outFlow
         } else {

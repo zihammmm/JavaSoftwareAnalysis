@@ -1,23 +1,35 @@
 package dataflow.analysis.constprop
 
 import dataflow.analysis.DataFlowAnalysis
-import soot.Body
-import soot.BodyTransformer
-import soot.Local
+import dataflow.analysis.lattice.DataFlowTag
+import dataflow.analysis.solver.SolverFactory
+import logger.DefaultLogger
+import soot.*
 import soot.Unit
 import soot.jimple.*
+import soot.toolkits.graph.BriefUnitGraph
+import util.SootUtils
+import util.resultchecker.CPResultChecker
 
 object ConstantPropagation : BodyTransformer(), DataFlowAnalysis<FlowMap, Unit> {
+    private const val TAG = "ConstantPropagation"
 
     var isOutput = false
 
     override fun internalTransform(p0: Body?, p1: String?, p2: MutableMap<String, String>?) {
-        TODO("Not yet implemented")
+        val cfg = BriefUnitGraph(p0)
+        val solver = SolverFactory.newSolver(this, cfg)
+        solver.solve()
+        p0?.let {
+            it.addTag(DataFlowTag("ConstantTag", solver.afterFlow))
+            CPResultChecker.compare(it, solver.afterFlow)
+        }
+        if (isOutput && p0 != null) {
+            outputResult(p0, solver.afterFlow)
+        }
     }
 
-    override fun isForward(): Boolean {
-        return true
-    }
+    override fun isForward() = true
 
     override fun getEntryInitialFlow(node: Unit) = newInitialFlow()
 
@@ -130,6 +142,14 @@ object ConstantPropagation : BodyTransformer(), DataFlowAnalysis<FlowMap, Unit> 
                 Value.makeConstant(0)
             }
             else -> Value.NAC
+        }
+    }
+
+    @Synchronized
+    fun outputResult(body: Body, result: MutableMap<Unit, FlowMap>) {
+        val up = BriefUnitPrinter(body)
+        body.units.forEach {
+            DefaultLogger.d(TAG, "${SootUtils.unitToString(up, it)}:${result[it]}")
         }
     }
 
