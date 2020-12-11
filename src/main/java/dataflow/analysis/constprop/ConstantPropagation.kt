@@ -2,6 +2,7 @@ package dataflow.analysis.constprop
 
 import dataflow.analysis.DataFlowAnalysis
 import dataflow.analysis.lattice.DataFlowTag
+import dataflow.analysis.solver.AbstractSolver
 import dataflow.analysis.solver.SolverFactory
 import logger.DefaultLogger
 import soot.*
@@ -18,7 +19,7 @@ object ConstantPropagation : BodyTransformer(), DataFlowAnalysis<FlowMap, Unit> 
 
     override fun internalTransform(p0: Body?, p1: String?, p2: MutableMap<String, String>?) {
         val cfg = BriefUnitGraph(p0)
-        val solver = SolverFactory.newSolver(this, cfg)
+        val solver = SolverFactory.newWorklistSolver(this, cfg)
         solver.solve()
         p0?.let {
             it.addTag(DataFlowTag("ConstantTag", solver.afterFlow))
@@ -89,8 +90,8 @@ object ConstantPropagation : BodyTransformer(), DataFlowAnalysis<FlowMap, Unit> 
             is Local -> inFlowMap[rhs]
             is IntConstant -> Value.makeConstant(rhs.value)
             is BinopExpr -> {
-                val l = computeValue(rhs.op1, inFlowMap)!!
-                val r = computeValue(rhs.op2, inFlowMap)!!
+                val l = computeValue(rhs.op1, inFlowMap)
+                val r = computeValue(rhs.op2, inFlowMap)
                 if (l.isNAC || r.isNAC) {
                     Value.NAC
                 } else if (l.isConstant && r.isConstant) {
