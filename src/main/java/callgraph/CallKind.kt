@@ -1,4 +1,4 @@
-package base.callgraph
+package callgraph
 
 enum class CallKind {
     INTERFACE,

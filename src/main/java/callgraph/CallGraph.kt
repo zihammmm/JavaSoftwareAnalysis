@@ -1,4 +1,4 @@
-package base.callgraph
+package callgraph
 
 interface CallGraph<CallSite, Method>: Iterable<Edge<CallSite, Method>> {
     fun getCallees(callSite: CallSite): Collection<Method>
