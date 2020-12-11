@@ -14,7 +14,7 @@ import util.resultchecker.CPResultChecker
 object ConstantPropagation : BodyTransformer(), DataFlowAnalysis<FlowMap, Unit> {
     private const val TAG = "ConstantPropagation"
 
-    var isOutput = false
+    var isOutput = true
 
     override fun internalTransform(p0: Body?, p1: String?, p2: MutableMap<String, String>?) {
         val cfg = BriefUnitGraph(p0)

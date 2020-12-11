@@ -1,10 +1,12 @@
 package util.resultchecker
 
+import dataflow.analysis.constprop.main
 import soot.G
 import soot.Unit
 import soot.UnitPatchingChain
 import java.nio.file.Files
 import java.nio.file.Path
+import java.nio.file.Paths
 import java.util.*
 
 abstract class AbstractResultChecker<K, V>{
@@ -14,12 +16,16 @@ abstract class AbstractResultChecker<K, V>{
 
     abstract fun readExpectedResult(filePath: Path)
 
-    fun check(args: Array<String>, path: String) {
+    fun check(args: Array<String>, path: String): Set<String> {
+        readExpectedResult(Paths.get(path))
         G.reset()
+        main(args)
+        return mismatches
     }
 
     protected fun isLastUnitOfItsLine(units: UnitPatchingChain, unit: Unit): Boolean {
-        return units.getSuccOf(unit).javaSourceStartLineNumber != unit.javaSourceStartLineNumber
+        val succ = units.getSuccOf(unit)
+        return succ == null || succ.javaSourceStartLineNumber != unit.javaSourceStartLineNumber
     }
 
 

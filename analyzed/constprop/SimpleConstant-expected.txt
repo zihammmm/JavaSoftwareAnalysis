@@ -1,0 +1,9 @@
+<SimpleConstant: void constant()>
+4:x=1
+5:y=2
+6:x=1,y=2,z=3
+
+<SimpleConstant: void propagation()>
+10:x=10
+11:y=10
+12:z=10

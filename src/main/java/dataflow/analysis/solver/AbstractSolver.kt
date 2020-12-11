@@ -8,8 +8,8 @@ abstract class AbstractSolver<Domain, Node> constructor(
     protected val analysis: DataFlowAnalysis<Domain, Node>,
     protected var cfg: DirectedGraph<Node>
 ) {
-    protected lateinit var inFlow: MutableMap<Node, Domain>
-    protected lateinit var outFlow: MutableMap<Node, Domain>
+    protected val inFlow: MutableMap<Node, Domain> = LinkedHashMap()
+    protected val outFlow: MutableMap<Node, Domain> = LinkedHashMap()
 
     init {
         if (!analysis.isForward()) {

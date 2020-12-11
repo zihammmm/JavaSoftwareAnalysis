@@ -9,30 +9,26 @@ class IterativeSolver<Domain, Node> constructor(
 ) : AbstractSolver<Domain, Node>(
     analysis, cfg
 ) {
-    init {
-        inFlow = LinkedHashMap()
-        outFlow = LinkedHashMap()
-    }
 
     override fun solveFixedPoint(cfg: DirectedGraph<Node>) {
-        var changed = false
         do {
+            var changed = false
             for (node in cfg) {
-                val inVar =
-                        if (cfg.heads.contains(node)) {
-                            inFlow[node]
-                        } else {
-                            cfg.getPredsOf(node).asSequence()
-                                    .map {
-                                        outFlow[it]
-                                    }
-                                    .reduce { acc, domain ->
-                                        analysis.meet(acc!!, domain!!)
-                                    }
+                var inVar: Domain?
+                if (cfg.heads.contains(node)) {
+                    inVar = inFlow[node]
+                } else {
+                    inVar = cfg.getPredsOf(node)
+                        .stream()
+                        .map(outFlow::get)
+                        .reduce(analysis.newInitialFlow()){sum, succ ->
+                            analysis.meet(sum!!, succ!!)
                         }
-                inFlow[node] = inVar!!
+
+                    inFlow[node] = inVar!!
+                }
                 val outVar = outFlow[node]
-                changed = changed or analysis.transfer(node, inVar, outVar!!)
+                changed = changed or analysis.transfer(node, inVar!!, outVar!!)
             }
         }while (changed)
     }
