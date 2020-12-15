@@ -5,13 +5,12 @@ import dataflow.analysis.constprop.FlowMap
 import dataflow.analysis.lattice.DataFlowTag
 import dataflow.analysis.lattice.FlowSet
 import logger.Logger
-import soot.Body
-import soot.BodyTransformer
-import soot.Local
+import soot.*
 import soot.Unit
 import soot.jimple.*
 import soot.toolkits.graph.BriefUnitGraph
 import soot.toolkits.graph.DirectedGraph
+import util.SootUtils
 import java.util.Comparator
 
 object DeadCodeDetection: BodyTransformer() {
@@ -121,7 +120,25 @@ object DeadCodeDetection: BodyTransformer() {
     }
 
     override fun internalTransform(p0: Body?, p1: String?, p2: MutableMap<String, String>?) {
-        TODO("Not yet implemented")
+        if (p0 != null) {
+            val deadCode = findDeadCode(p0)
+            if (isOutput) {
+                outputResult(p0, deadCode)
+            }
+        }
+    }
+
+    @Synchronized
+    private fun outputResult(body: Body, deadCode: Set<Unit>) {
+        val up = BriefUnitPrinter(body)
+        body.units
+            .asSequence()
+            .filter {
+                deadCode.contains(it)
+            }
+            .forEach {
+                Logger.d(TAG, SootUtils.unitToString(up, it))
+            }
     }
 
     private class EdgeSet {
