@@ -85,7 +85,7 @@ object ConstantPropagation : BodyTransformer(), DataFlowAnalysis<FlowMap, Unit> 
     }
 
 
-    private fun computeValue(rhs: soot.Value, inFlowMap: FlowMap): Value {
+    fun computeValue(rhs: soot.Value, inFlowMap: FlowMap): Value {
         return when (rhs) {
             is Local -> inFlowMap[rhs]
             is IntConstant -> Value.makeConstant(rhs.value)

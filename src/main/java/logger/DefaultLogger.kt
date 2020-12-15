@@ -8,7 +8,7 @@ object DefaultLogger: ILogger {
     }
 
     override fun d(tag: String, msg: String) {
-        println("[$tag]: $msg")
+        println("[$tag/d]: $msg")
     }
 
     override fun i(tag: String, msg: String) {
