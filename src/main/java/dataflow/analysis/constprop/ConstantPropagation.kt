@@ -2,7 +2,6 @@ package dataflow.analysis.constprop
 
 import dataflow.analysis.DataFlowAnalysis
 import dataflow.analysis.lattice.DataFlowTag
-import dataflow.analysis.solver.AbstractSolver
 import dataflow.analysis.solver.SolverFactory
 import logger.DefaultLogger
 import soot.*
@@ -50,17 +49,17 @@ object ConstantPropagation : BodyTransformer(), DataFlowAnalysis<FlowMap, Unit> 
         return result
     }
 
-    override fun transfer(node: Unit, v1: FlowMap, v2: FlowMap): Boolean {
+    override fun transfer(node: Unit, inDomain: FlowMap, outDomain: FlowMap): Boolean {
         val oldOut = FlowMap()
-        oldOut.copyFrom(v2)
-        v2.copyFrom(v1)
+        oldOut.copyFrom(outDomain)
+        outDomain.copyFrom(inDomain)
         if (node is DefinitionStmt) {
             val x = node.leftOp as Local
             val r = node.rightOp
-            val temp = computeValue(r, v1)
-            v2.update(x, temp)
+            val temp = computeValue(r, inDomain)
+            outDomain.update(x, temp)
         }
-        return oldOut != v2
+        return oldOut != outDomain
     }
 
     override fun newInitialFlow() = FlowMap()

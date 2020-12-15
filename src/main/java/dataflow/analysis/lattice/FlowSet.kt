@@ -1,6 +1,6 @@
 package dataflow.analysis.lattice
 
-interface FlowSet<E>: Set<E> {
+interface FlowSet<E>: MutableSet<E> {
     fun union(v1: FlowSet<E>): FlowSet<E>
 
     fun intersect(v1: FlowSet<E>): FlowSet<E>

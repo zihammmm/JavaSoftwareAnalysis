@@ -9,5 +9,5 @@ interface DataFlowAnalysis<Domain, Node> {
 
     fun meet(v1: Domain, v2: Domain): Domain
 
-    fun transfer(node: Node, v1: Domain, v2: Domain): Boolean
+    fun transfer(node: Node, inDomain: Domain, outDomain: Domain): Boolean
 }
