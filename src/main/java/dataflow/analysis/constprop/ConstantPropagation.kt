@@ -8,8 +8,8 @@ import soot.*
 import soot.Unit
 import soot.jimple.*
 import soot.toolkits.graph.BriefUnitGraph
-import util.SootUtils
 import util.resultchecker.CPResultChecker
+import util.unitToString
 
 object ConstantPropagation : BodyTransformer(), DataFlowAnalysis<FlowMap, Unit> {
     private const val TAG = "ConstantPropagation"
@@ -149,7 +149,7 @@ object ConstantPropagation : BodyTransformer(), DataFlowAnalysis<FlowMap, Unit> 
     fun outputResult(body: Body, result: MutableMap<Unit, FlowMap>) {
         val up = BriefUnitPrinter(body)
         body.units.forEach {
-            DefaultLogger.d(TAG, "${SootUtils.unitToString(up, it)}:${result[it]}")
+            DefaultLogger.d(TAG, "${unitToString(up, it)}:${result[it]}")
         }
     }
 

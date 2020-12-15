@@ -9,7 +9,7 @@ import logger.Logger
 import soot.*
 import soot.Unit
 import soot.toolkits.graph.BriefUnitGraph
-import util.SootUtils
+import util.unitToString
 
 class LiveVariableAnalysis: BodyTransformer(), DataFlowAnalysis<FlowSet<Local>, Unit> {
     companion object {
@@ -66,7 +66,7 @@ class LiveVariableAnalysis: BodyTransformer(), DataFlowAnalysis<FlowSet<Local>, 
         val up = BriefUnitPrinter(body)
         body.units
             .forEach {
-                Logger.d(TAG, "${SootUtils.unitToString(up, it)}: ${result[it]}")
+                Logger.d(TAG, "${unitToString(up, it)}: ${result[it]}")
             }
     }
 }

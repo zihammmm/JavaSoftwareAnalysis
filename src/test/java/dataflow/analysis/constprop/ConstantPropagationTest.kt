@@ -10,16 +10,16 @@ internal class ConstantPropagationTest {
 
     @Test
     fun testSimpleConstant() {
-        test(resultCheck, "SimpleConstant")
+        test(resultCheck, "SimpleConstant", "constprop")
     }
 
     @Test
     fun testSimpleBinary() {
-        test(resultCheck, "SimpleBinary")
+        test(resultCheck, "SimpleBinary", "constprop")
     }
 
     @Test
     fun testSimpleBranch() {
-        test(resultCheck, "SimpleBranch")
+        test(resultCheck, "SimpleBranch", "constprop")
     }
 }

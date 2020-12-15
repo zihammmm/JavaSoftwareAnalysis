@@ -4,11 +4,13 @@ import dataflow.analysis.constprop.main
 import soot.G
 import soot.Unit
 import soot.UnitPatchingChain
-import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
 import java.util.*
 
+/**
+ * 结果检查抽象类
+ */
 abstract class AbstractResultChecker<K, V>{
     protected val resultMap = TreeMap<K, V>()
 

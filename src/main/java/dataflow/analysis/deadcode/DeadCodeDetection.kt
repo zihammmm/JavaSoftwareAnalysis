@@ -10,7 +10,7 @@ import soot.Unit
 import soot.jimple.*
 import soot.toolkits.graph.BriefUnitGraph
 import soot.toolkits.graph.DirectedGraph
-import util.SootUtils
+import util.unitToString
 import java.util.Comparator
 
 object DeadCodeDetection: BodyTransformer() {
@@ -137,7 +137,7 @@ object DeadCodeDetection: BodyTransformer() {
                 deadCode.contains(it)
             }
             .forEach {
-                Logger.d(TAG, SootUtils.unitToString(up, it))
+                Logger.d(TAG, unitToString(up, it))
             }
     }
 
