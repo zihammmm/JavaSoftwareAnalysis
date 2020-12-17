@@ -18,7 +18,7 @@ interface CallSite {
 
     var receiver: Variable?
 
-    var arguments: MutableList<Variable>?
+    var arguments: MutableList<in Variable>?
 
     var containerMethod: Method?
 }

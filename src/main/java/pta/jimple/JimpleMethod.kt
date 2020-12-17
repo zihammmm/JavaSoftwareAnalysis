@@ -14,8 +14,8 @@ data class JimpleMethod(
         private const val initialCapacity = 4
     }
     private var thisVar: JimpleVariable? = null
-    private var parameters = mutableListOf<Variable>()
-    private var returnVars = mutableSetOf<Variable>()
+    private var parameters: MutableList<Variable> = mutableListOf()
+    private var returnVars: MutableSet<Variable> = mutableSetOf()
     private var statements = mutableSetOf<Statement>()
 
     override val isInstance: Boolean
@@ -26,6 +26,14 @@ data class JimpleMethod(
 
     override val isNative: Boolean
         get() = method.isNative
+
+    fun setThis(variable: JimpleVariable) {
+        thisVar = variable
+    }
+
+    fun setParameters(params: MutableList<Variable>) {
+        parameters = params
+    }
 
     override fun getClassType(): Type {
         return classType
