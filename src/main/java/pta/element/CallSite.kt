@@ -12,13 +12,13 @@ interface CallSite {
 
     val isStatic: Boolean
 
-    fun getCall(): Call
+    var call: Call?
 
-    fun getMethod(): Method
+    var method: Method?
 
-    fun getReceiver(): Variable
+    var receiver: Variable?
 
-    fun getArguments(): List<Variable>
+    var arguments: MutableList<Variable>?
 
-    fun getContainerMethod(): Method
+    var containerMethod: Method?
 }

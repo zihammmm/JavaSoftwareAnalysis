@@ -5,10 +5,10 @@ interface Field {
 
     val isStatic: Boolean
 
-    fun getClassType(): Type
+    val classType: Type
 
-    fun getName(): String?
+    val name: String
 
-    fun getFieldType(): Type
+    val fieldType: Type
 
 }
