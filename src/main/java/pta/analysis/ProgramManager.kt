@@ -9,7 +9,7 @@ interface ProgramManager {
 
     fun canAssign(from: Type, to: Type): Boolean
 
-    fun resolveInterfaceOrVirtualCall(recvType: Type, method: Method)
+    fun resolveInterfaceOrVirtualCall(recvType: Type, method: Method): Method
 
-    fun resolveSpecialCall(callSite: CallSite, container: Method)
+    fun resolveSpecialCall(callSite: CallSite, container: Method): Method
 }

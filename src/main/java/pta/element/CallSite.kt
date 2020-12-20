@@ -1,7 +1,9 @@
 package pta.element
 
 
+import callgraph.CallKind
 import pta.statement.Call
+import util.AnalysisException
 
 interface CallSite {
     val isInterface: Boolean
@@ -18,7 +20,17 @@ interface CallSite {
 
     var receiver: Variable?
 
-    var arguments: MutableList<in Variable>?
+    var arguments: MutableList<Variable>
 
     var containerMethod: Method?
+}
+
+fun CallSite.callKind(): CallKind {
+    return when {
+        isInterface -> CallKind.INTERFACE
+        isVirtual -> CallKind.VIRTUAL
+        isSpecial -> CallKind.SPECIAL
+        isStatic -> CallKind.STATIC
+        else -> throw AnalysisException("Unknown call site: $this")
+    }
 }

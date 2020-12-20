@@ -89,7 +89,7 @@ class ElementManager {
                 .filter {
                     it != null
                 }
-                .toCollection(mutableListOf())
+                .toCollection(mutableListOf()) as MutableList<Variable>
 
             containerMethod = container
         }

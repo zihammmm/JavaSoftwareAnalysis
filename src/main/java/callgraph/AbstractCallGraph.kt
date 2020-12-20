@@ -25,7 +25,7 @@ abstract class AbstractCallGraph<CallSite, Method> : CallGraph<CallSite, Method>
         return callSiteToEdges.addToMapSet(callSite, edge) or calleeToEdges.addToMapSet(method, edge)
     }
 
-    protected abstract fun addNewMethod(method: Method): Boolean
+    abstract fun addNewMethod(method: Method): Boolean
 
     override fun getCallees(callSite: CallSite): Collection<Method> {
         val edges = callSiteToEdges[callSite]

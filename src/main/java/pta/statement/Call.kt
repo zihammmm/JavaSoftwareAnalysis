@@ -4,13 +4,9 @@ import pta.element.CallSite
 import pta.element.Variable
 
 class Call constructor(
-    private val callSite: CallSite,
-    private val lhs: Variable?
+    val callSite: CallSite,
+    val lhs: Variable?
 ): Statement {
-
-    fun getCallSite() = callSite
-
-    fun getLHS() = lhs
 
     override val kind: Statement.Kind
         get() = Statement.Kind.CALL

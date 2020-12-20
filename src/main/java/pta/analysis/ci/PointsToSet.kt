@@ -3,18 +3,16 @@ package pta.analysis.ci
 import pta.element.Obj
 import util.HybridArrayHashSet
 
-class PointsToSet(
-    obj: Obj
-): Iterable<Obj> {
+class PointsToSet: Iterable<Obj> {
     private val set = HybridArrayHashSet<Obj>()
 
     constructor()
+    constructor(obj: Obj) {
+        addObject(obj)
+    }
 
     fun addObject(obj: Obj) = set.add(obj)
 
-    init {
-        addObject(obj)
-    }
 
     val isEmpty = set.isEmpty()
 

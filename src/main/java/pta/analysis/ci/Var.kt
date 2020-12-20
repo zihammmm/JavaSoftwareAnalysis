@@ -7,7 +7,7 @@ import pta.element.Variable
  */
 class Var constructor(
     private val variable: Variable
-): Pointer() {
+): AbstractPointer() {
 
     fun getVariable() = variable
 

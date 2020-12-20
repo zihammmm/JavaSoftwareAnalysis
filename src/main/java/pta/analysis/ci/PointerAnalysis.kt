@@ -1,15 +1,27 @@
 package pta.analysis.ci
 
+import bamboo.util.AnalysisException
 import base.IAnalysis
+import callgraph.CallKind
+import callgraph.Edge
+import pta.analysis.ProgramManager
 import pta.analysis.heap.HeapModel
+import pta.element.CallSite
+import pta.element.Method
+import pta.element.Obj
+import pta.element.callKind
+import pta.statement.Allocation
+import pta.statement.Assign
+import pta.statement.Call
 
-class PointerAnalysis: IAnalysis {
+class PointerAnalysis constructor(
+    private val heapModel: HeapModel,
+    private val programManager: ProgramManager
+) : IAnalysis {
 
     private lateinit var callGraph: OnFlyCallGraph
 
     private lateinit var workList: WorkList
-
-    private lateinit var heapModel: HeapModel
 
     private lateinit var pointerFlowGraph: PointerFlowGraph
 
@@ -29,14 +41,172 @@ class PointerAnalysis: IAnalysis {
         callGraph = OnFlyCallGraph()
         pointerFlowGraph = PointerFlowGraph()
         workList = WorkList()
-
+        for (entry in programManager.getEntryMethods()) {
+            addReachable(entry)
+            callGraph.addEntryMethod(entry)
+        }
     }
 
     override fun solve() {
         initialize()
+        analyze()
     }
 
     private fun analyze() {
+        while (!workList.isEmpty) {
+            while (workList.hasPointerEntries) {
+                val entry = workList.pollPointerEntry()
+                val p = entry.pointer
+                val pts = entry.pointsToSet
+                val diff = propagate(p, pts)
+                if (p is Var) {
+                    processInstanceStore(p, diff)
+                    processInstanceLoad(p, diff)
+                    processCall(p, diff)
+                }
+            }
+            while (workList.hasCallEdges) {
+                processCallEdge(workList.pollCallEdge())
+            }
+        }
+    }
 
+    fun propagate(pointer: AbstractPointer, pointsToSet: PointsToSet): PointsToSet {
+        val diff = PointsToSet()
+        if (pointer.getPointsToSet().isEmpty) {
+            pointsToSet.forEach(diff::addObject)
+        } else {
+            pointsToSet.asSequence()
+                .filter {
+                    pointer.getPointsToSet().asSequence()
+                        .any { obj ->
+                            obj != it
+                        }
+                }
+                .forEach {
+                    diff.addObject(it)
+                }
+        }
+
+        if (!diff.isEmpty) {
+            diff.asSequence().forEach {
+                pointer.getPointsToSet().addObject(it)
+            }
+            pointerFlowGraph.getSuccessorsOf(pointer).forEach {
+                workList.addPointerEntry(it, diff)
+            }
+        }
+
+        return diff
+    }
+
+    private fun addReachable(method: Method) {
+        if (callGraph.addNewMethod(method)) {
+            for (statement in method.getStatements()) {
+                when (statement) {
+                    is Allocation -> processAllocation(statement, method)
+                    is Assign -> processLocalAssign(statement, method)
+                    is Call -> processStaticCalls(statement, method)
+                }
+            }
+        }
+    }
+
+    private fun processAllocation(statement: Allocation, method: Method) {
+        val variable = statement.variable
+        val allocationSite = statement.allocationSite
+        val obj = heapModel.getObj(allocationSite, statement.type, method)
+        workList.addPointerEntry(pointerFlowGraph.getVar(variable), PointsToSet(obj))
+    }
+
+    private fun processLocalAssign(statement: Assign, method: Method) {
+        val to = pointerFlowGraph.getVar(statement.to)
+        val from = pointerFlowGraph.getVar(statement.from)
+        addPFGEdge(from, to)
+    }
+
+    private fun processStaticCalls(statement: Call, method: Method) {
+        val callSite = statement.callSite
+        if (callSite.isStatic) {
+            val callee = callSite.method!!
+            workList.addCallEdge(Edge(CallKind.STATIC, callSite, callee))
+        }
+    }
+
+    private fun processCall(recv: Var, pts: PointsToSet) {
+        val variable = recv.getVariable()
+        for(call in variable.getCalls()) {
+            val callSite = call.callSite
+            for (recvObj in pts) {
+                val callee = resolveCallee(recvObj, callSite)
+                val thisVar = pointerFlowGraph.getVar(callee.getThis())
+                workList.addPointerEntry(thisVar, PointsToSet(recvObj))
+                workList.addCallEdge(Edge(callSite.callKind(), callSite, callee))
+            }
+        }
+    }
+
+    private fun addPFGEdge(from: AbstractPointer, to: AbstractPointer) {
+        if (pointerFlowGraph.addEdge(from, to)) {
+            if (!from.getPointsToSet().isEmpty) {
+                workList.addPointerEntry(to, from.getPointsToSet())
+            }
+        }
+    }
+
+    private fun resolveCallee(recvObj: Obj, callSite: CallSite): Method {
+        return when {
+            callSite.isInterface || callSite.isVirtual ->
+                programManager.resolveInterfaceOrVirtualCall(recvObj.getType(), callSite.method!!)
+            callSite.isSpecial ->
+                programManager.resolveSpecialCall(callSite, callSite.containerMethod!!)
+            else ->
+                throw AnalysisException("Unknown CallSite: $callSite")
+        }
+    }
+
+    private fun processCallEdge(edge: Edge<CallSite, Method>) {
+        if (!callGraph.containsEdge(edge)) {
+            callGraph.addEdge(edge)
+            val callee = edge.callee
+            addReachable(callee)
+            val callSite = edge.callSite
+            val args = callSite.arguments
+            val params = callee.getParameters()
+            for (i in params.indices) {
+                val arg = pointerFlowGraph.getVar(args[i])
+                val param = pointerFlowGraph.getVar(params[i])
+                addPFGEdge(arg, param)
+            }
+            callSite.call!!.lhs?.let {
+                val lhs = pointerFlowGraph.getVar(it)
+                for (ret in callee.getReturnVariables()) {
+                    val retVar = pointerFlowGraph.getVar(ret)
+                    addPFGEdge(retVar, lhs)
+                }
+            }
+        }
+    }
+
+    private fun processInstanceLoad(base: Var, pts: PointsToSet) {
+        pts.asSequence().forEach {obj ->
+            base.getVariable().getLoads().forEach { instanceLoad ->
+                pointerFlowGraph.addEdge(
+                    pointerFlowGraph.getInstanceFiled(obj, instanceLoad.getField()),
+                    pointerFlowGraph.getVar(instanceLoad.getTo())
+                )
+            }
+        }
+    }
+
+    private fun processInstanceStore(base: Var, pts: PointsToSet) {
+        pts.asSequence().forEach { obj ->
+            base.getVariable().getStores().forEach { instanceStore ->
+                pointerFlowGraph.addEdge(
+                    pointerFlowGraph.getVar(instanceStore.getFrom()),
+                    pointerFlowGraph.getInstanceFiled(obj, instanceStore.getField())
+                )
+            }
+        }
     }
 }

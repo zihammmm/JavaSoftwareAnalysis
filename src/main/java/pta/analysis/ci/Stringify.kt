@@ -3,7 +3,7 @@ package pta.analysis.ci
 import pta.element.Obj
 import soot.jimple.AssignStmt
 
-fun Pointer.pointerToString(): String {
+fun AbstractPointer.pointerToString(): String {
     return if (this is InstanceField) {
         "${getBase().objToString()}.${getField().getName()}"
     } else {

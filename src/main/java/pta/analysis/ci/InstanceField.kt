@@ -9,7 +9,7 @@ import pta.element.Obj
 class InstanceField constructor(
     private val base: Obj,
     private val field: Field
-): Pointer() {
+): AbstractPointer() {
 
     fun getBase() = base
 

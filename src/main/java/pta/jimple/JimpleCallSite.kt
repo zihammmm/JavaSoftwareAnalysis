@@ -45,7 +45,7 @@ data class JimpleCallSite(
 
     val sootInvokeExpr = stmt.invokeExpr
 
-    override var arguments: MutableList<in Variable>? = null
+    override var arguments: MutableList<Variable> = mutableListOf()
 
     override var containerMethod: Method? = null
 

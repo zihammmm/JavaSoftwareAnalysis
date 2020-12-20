@@ -8,7 +8,7 @@ class PointerFlowGraph {
     /**
      * Set of all pointers in this PFG
      */
-    private val pointer = HashSet<Pointer>()
+    private val pointer = HashSet<AbstractPointer>()
 
     /**
      * Map from (Obj, Field) to InstanceField node
@@ -23,7 +23,7 @@ class PointerFlowGraph {
     /**
      * Map from a pointer(node) to its successors
      */
-    private val graph = HashMap<Pointer, HashSet<Pointer>>()
+    private val graph = HashMap<AbstractPointer, HashSet<AbstractPointer>>()
 
     fun getVar(variable: Variable): Var {
         return vars.getOrPut(variable) {
@@ -33,7 +33,7 @@ class PointerFlowGraph {
         }
     }
 
-    fun getPointer(): Set<Pointer> {
+    fun getPointer(): Set<AbstractPointer> {
         return pointer
     }
 
@@ -47,11 +47,13 @@ class PointerFlowGraph {
         }
     }
 
-    fun addEdge(from: Pointer, to: Pointer): Boolean {
+    fun addEdge(from: AbstractPointer, to: AbstractPointer): Boolean {
         return graph.getOrPut(from) {
             HashSet()
         }.add(to)
     }
+
+    fun getSuccessorsOf(pointer: AbstractPointer): Set<AbstractPointer> = graph.getOrDefault(pointer, emptySet())
 
     override fun toString(): String {
         return "PointerFlowGraph {graph= $graph }"
