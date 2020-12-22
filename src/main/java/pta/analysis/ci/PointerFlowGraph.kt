@@ -37,7 +37,7 @@ class PointerFlowGraph {
         return pointer
     }
 
-    fun getInstanceFiled(obj: Obj, field: Field): InstanceField {
+    fun getInstanceField(obj: Obj, field: Field): InstanceField {
         return instanceField.getOrPut(obj){
             HashMap()
         }.getOrElse(field) {

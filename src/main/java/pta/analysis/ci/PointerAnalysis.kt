@@ -73,27 +73,15 @@ class PointerAnalysis constructor(
 
     fun propagate(pointer: AbstractPointer, pointsToSet: PointsToSet): PointsToSet {
         val diff = PointsToSet()
-        if (pointer.getPointsToSet().isEmpty) {
-            pointsToSet.forEach(diff::addObject)
-        } else {
-            pointsToSet.asSequence()
-                .filter {
-                    pointer.getPointsToSet().asSequence()
-                        .any { obj ->
-                            obj != it
-                        }
-                }
-                .forEach {
-                    diff.addObject(it)
-                }
+        pointsToSet.sequence().forEach { obj->
+            if (pointer.getPointsToSet().addObject(obj)) {
+                diff.addObject(obj)
+            }
         }
 
         if (!diff.isEmpty) {
-            diff.asSequence().forEach {
-                pointer.getPointsToSet().addObject(it)
-            }
-            pointerFlowGraph.getSuccessorsOf(pointer).forEach {
-                workList.addPointerEntry(it, diff)
+            pointerFlowGraph.getSuccessorsOf(pointer).asSequence().forEach { s ->
+                workList.addPointerEntry(s, diff)
             }
         }
 
@@ -189,22 +177,23 @@ class PointerAnalysis constructor(
     }
 
     private fun processInstanceLoad(base: Var, pts: PointsToSet) {
-        pts.asSequence().forEach {obj ->
-            base.getVariable().getLoads().forEach { instanceLoad ->
-                pointerFlowGraph.addEdge(
-                    pointerFlowGraph.getInstanceFiled(obj, instanceLoad.getField()),
-                    pointerFlowGraph.getVar(instanceLoad.getTo())
-                )
+        base.getVariable().getStores()
+            .forEach { obj ->
+                pts.asSequence().forEach { pt ->
+                    addPFGEdge(
+                        pointerFlowGraph.getVar(obj.getFrom()),
+                        pointerFlowGraph.getInstanceField(pt, obj.getField())
+                    )
+                }
             }
-        }
     }
 
     private fun processInstanceStore(base: Var, pts: PointsToSet) {
-        pts.asSequence().forEach { obj ->
-            base.getVariable().getStores().forEach { instanceStore ->
-                pointerFlowGraph.addEdge(
-                    pointerFlowGraph.getVar(instanceStore.getFrom()),
-                    pointerFlowGraph.getInstanceFiled(obj, instanceStore.getField())
+        base.getVariable().getLoads().forEach { obj ->
+            pts.asSequence().forEach { pt ->
+                addPFGEdge(
+                    pointerFlowGraph.getInstanceField(pt, obj.getField()),
+                    pointerFlowGraph.getVar(obj.getTo())
                 )
             }
         }
