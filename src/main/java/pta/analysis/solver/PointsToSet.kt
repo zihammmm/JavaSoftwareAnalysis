@@ -1,4 +1,4 @@
-package pta.analysis.ci
+package pta.analysis.solver
 
 import pta.element.Obj
 import util.HybridArrayHashSet

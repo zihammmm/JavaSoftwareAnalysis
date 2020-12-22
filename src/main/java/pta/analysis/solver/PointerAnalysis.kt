@@ -1,4 +1,4 @@
-package pta.analysis.ci
+package pta.analysis.solver
 
 import bamboo.util.AnalysisException
 import base.IAnalysis
@@ -93,8 +93,8 @@ class PointerAnalysis constructor(
             for (statement in method.getStatements()) {
                 when (statement) {
                     is Allocation -> processAllocation(statement, method)
-                    is Assign -> processLocalAssign(statement, method)
-                    is Call -> processStaticCalls(statement, method)
+                    is Assign -> processLocalAssign(statement)
+                    is Call -> processStaticCalls(statement)
                 }
             }
         }
@@ -107,13 +107,13 @@ class PointerAnalysis constructor(
         workList.addPointerEntry(pointerFlowGraph.getVar(variable), PointsToSet(obj))
     }
 
-    private fun processLocalAssign(statement: Assign, method: Method) {
+    private fun processLocalAssign(statement: Assign) {
         val to = pointerFlowGraph.getVar(statement.to)
         val from = pointerFlowGraph.getVar(statement.from)
         addPFGEdge(from, to)
     }
 
-    private fun processStaticCalls(statement: Call, method: Method) {
+    private fun processStaticCalls(statement: Call) {
         val callSite = statement.callSite
         if (callSite.isStatic) {
             val callee = callSite.method!!

@@ -1,4 +1,4 @@
-package pta.analysis.ci
+package pta.analysis.solver
 
 abstract class AbstractPointer {
     private val pointsToSet = PointsToSet()
