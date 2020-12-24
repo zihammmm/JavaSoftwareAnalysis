@@ -1,4 +1,5 @@
 package pta.analysis.context
 
-object DefaultContext {
+object DefaultContext: IContext {
+
 }

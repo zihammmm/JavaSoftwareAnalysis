@@ -1,21 +1,32 @@
 package pta.analysis.context
 
-open class Context<T> constructor(
-    private val capability: Int
-) {
-    private val elementList = ArrayDeque<T>()
+import java.lang.IllegalArgumentException
 
-    val depth: Int
+open class Context<T> constructor(
+    private val capability: Int = 0
+) : IContext {
+    private val elementList: ArrayDeque<T>
+        get() = ArrayDeque(capability)
+
+    override val depth: Int
         get() = elementList.size
 
     fun element(index: Int): T {
-        return elementList[index]
+        if (index < depth) {
+            return elementList[index]
+        }
+        throw IllegalArgumentException(
+            "Context $this doesn't have $index-th element"
+        )
     }
 
-    fun addElement(ele: T) {
-        while (depth >= capability) {
-            elementList.removeFirst()
+    fun addElement(element: T): Boolean {
+        if(capability == 0) {
+            throw IllegalStateException("The Capability is 0!")
         }
-        elementList.add(ele)
+        while (depth < capability) {
+            elementList.removeFirst();
+        }
+        return elementList.add(element)
     }
 }
