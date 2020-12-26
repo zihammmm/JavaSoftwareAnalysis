@@ -1,8 +1,8 @@
 package pta.analysis.solver
 
-abstract class AbstractPointer {
-    private val pointsToSet = PointsToSet()
+import pta.analysis.data.Pointer
+import pta.set.PointsToSet
 
-    fun getPointsToSet() = pointsToSet
+abstract class AbstractPointer {
 
 }

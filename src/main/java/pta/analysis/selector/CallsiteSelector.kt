@@ -1,7 +1,9 @@
 package pta.analysis.selector
 
 import pta.analysis.context.*
-import pta.element.CallSite
+import pta.analysis.data.CSCallsite
+import pta.analysis.data.CSMethod
+import pta.analysis.data.CSObj
 import pta.element.Method
 
 /**
@@ -12,15 +14,15 @@ class CallsiteSelector constructor(
 ): ContextSelector {
     private val callsiteSensitive = CallsiteSensitive(k)
 
-    override fun selectContext(callSite: CallsiteSensitive, callee: Method): IContext {
+    override fun selectContext(callSite: CSCallsite, callee: Method): IContext {
         TODO("Not yet implemented")
     }
 
-    override fun selectContext(callSite: CallsiteSensitive, recv: ObjectSensitive, callee: Method): IContext {
+    override fun selectContext(callSite: CSCallsite, recv: CSObj, callee: Method): IContext {
         TODO("Not yet implemented")
     }
 
-    override fun selectHeapContext(method: MethodSensitive, allocationSite: Any): IContext {
+    override fun selectHeapContext(method: CSMethod, allocationSite: Any): IContext {
         return getDefaultContext()
     }
 

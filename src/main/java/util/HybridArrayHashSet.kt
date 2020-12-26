@@ -2,7 +2,7 @@ package util
 
 import java.io.Serializable
 
-class HybridArrayHashSet<V>(m: Collection<V>) : MutableSet<V>, Serializable {
+class HybridArrayHashSet<V> : MutableSet<V>, Serializable {
     companion object {
         private val NULL_KEY = "HybridArrayHashSet does not permit null keys"
         private val ARRAY_SIZE = 16
@@ -35,8 +35,7 @@ class HybridArrayHashSet<V>(m: Collection<V>) : MutableSet<V>, Serializable {
     private var hashSet: HashSet<V>? = null
 
     constructor()
-
-    init {
+    constructor(m: Collection<V>) {
         when {
             m.size == 1 -> singleton = getFirstElement(m)
             m.size <= ARRAY_SIZE -> {

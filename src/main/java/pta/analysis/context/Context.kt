@@ -2,6 +2,9 @@ package pta.analysis.context
 
 import java.lang.IllegalArgumentException
 
+/**
+ * k - T-Context Sensitivity
+ */
 open class Context<T> constructor(
     private val capability: Int = 0
 ) : IContext {

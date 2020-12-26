@@ -1,5 +1,7 @@
 package pta.analysis.solver
 
+import pta.analysis.data.InstanceField
+import pta.analysis.data.Pointer
 import pta.element.Field
 import pta.element.Obj
 import pta.element.Variable
@@ -47,13 +49,13 @@ class PointerFlowGraph {
         }
     }
 
-    fun addEdge(from: AbstractPointer, to: AbstractPointer): Boolean {
+    fun addEdge(from: Pointer, to: Pointer): Boolean {
         return graph.getOrPut(from) {
             HashSet()
         }.add(to)
     }
 
-    fun getSuccessorsOf(pointer: AbstractPointer): Set<AbstractPointer> = graph.getOrDefault(pointer, emptySet())
+    fun getSuccessorsOf(pointer: Pointer): Set<Pointer> = graph.getOrDefault(pointer, emptySet())
 
     override fun toString(): String {
         return "PointerFlowGraph {graph= $graph }"

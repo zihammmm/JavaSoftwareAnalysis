@@ -5,18 +5,23 @@ import base.IAnalysis
 import callgraph.CallKind
 import callgraph.Edge
 import pta.analysis.ProgramManager
+import pta.analysis.data.InstanceField
+import pta.analysis.data.Pointer
 import pta.analysis.heap.HeapModel
 import pta.element.CallSite
 import pta.element.Method
 import pta.element.Obj
 import pta.element.callKind
+import pta.set.PointsToSet
+import pta.set.PointsToSetFactory
 import pta.statement.Allocation
 import pta.statement.Assign
 import pta.statement.Call
 
 class PointerAnalysis constructor(
     private val heapModel: HeapModel,
-    private val programManager: ProgramManager
+    private val programManager: ProgramManager,
+    private val setFactory: PointsToSetFactory
 ) : IAnalysis {
 
     private lateinit var callGraph: OnFlyCallGraph
@@ -71,15 +76,15 @@ class PointerAnalysis constructor(
         }
     }
 
-    fun propagate(pointer: AbstractPointer, pointsToSet: PointsToSet): PointsToSet {
-        val diff = PointsToSet()
+    fun propagate(pointer: Pointer, pointsToSet: PointsToSet): PointsToSet {
+        val diff = setFactory.makePointsToSet()
         pointsToSet.sequence().forEach { obj->
-            if (pointer.getPointsToSet().addObject(obj)) {
+            if (pointer.pointsToSet!!.addObject(obj)) {
                 diff.addObject(obj)
             }
         }
 
-        if (!diff.isEmpty) {
+        if (!diff.isEmpty()) {
             pointerFlowGraph.getSuccessorsOf(pointer).asSequence().forEach { s ->
                 workList.addPointerEntry(s, diff)
             }
@@ -134,7 +139,7 @@ class PointerAnalysis constructor(
         }
     }
 
-    private fun addPFGEdge(from: AbstractPointer, to: AbstractPointer) {
+    private fun addPFGEdge(from: Pointer, to: Pointer) {
         if (pointerFlowGraph.addEdge(from, to)) {
             if (!from.getPointsToSet().isEmpty) {
                 workList.addPointerEntry(to, from.getPointsToSet())

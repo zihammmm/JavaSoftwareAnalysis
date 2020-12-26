@@ -1,15 +1,17 @@
 package pta.analysis.solver
 
+import pta.analysis.data.Pointer
 import pta.element.Obj
+import pta.set.PointsToSet
 import soot.jimple.AssignStmt
 
-fun AbstractPointer.pointerToString(): String {
-    return if (this is InstanceField) {
-        "${getBase().objToString()}.${getField().getName()}"
-    } else {
-        this.toString()
-    }
-}
+//fun Pointer.pointerToString(): String {
+//    return if (this is InstanceField) {
+//        "${getBase().objToString()}.${getField().getName()}"
+//    } else {
+//        this.toString()
+//    }
+//}
 
 fun Obj.objToString(): String {
     val sb = StringBuilder()
@@ -28,13 +30,14 @@ fun Obj.objToString(): String {
 }
 
 fun PointsToSet.pointsToSetToString(): String {
-    val objs = Iterable{asSequence()
-        .map {
-            it.objToString()
-        }
-        .sorted()
-        .iterator()
-    }
-
-    return "{${objs.joinToString(",")}}"
+//    val objs = Iterable{asSequence()
+//        .map {
+//            it.objToString()
+//        }
+//        .sorted()
+//        .iterator()
+//    }
+//
+//    return "{${objs.joinToString(",")}}"
+    return ""
 }

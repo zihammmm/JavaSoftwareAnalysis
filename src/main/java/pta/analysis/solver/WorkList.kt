@@ -1,8 +1,10 @@
 package pta.analysis.solver
 
 import callgraph.Edge
+import pta.analysis.data.Pointer
 import pta.element.CallSite
 import pta.element.Method
+import pta.set.PointsToSet
 
 class WorkList {
     private val pointerEntries = ArrayDeque<Entry>()
@@ -12,7 +14,7 @@ class WorkList {
     val hasCallEdges = callEdges.isNotEmpty()
     val isEmpty = !hasPointerEntries && !hasCallEdges
 
-    fun addPointerEntry(pointer: AbstractPointer, pointsToSet: PointsToSet) {
+    fun addPointerEntry(pointer: Pointer, pointsToSet: PointsToSet) {
         pointerEntries.add(Entry(pointer, pointsToSet))
     }
 
@@ -35,7 +37,7 @@ class WorkList {
     }
 
     data class Entry constructor(
-        val pointer: AbstractPointer,
+        val pointer: Pointer,
         val pointsToSet: PointsToSet
     )
 }
