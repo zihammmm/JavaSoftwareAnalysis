@@ -1,6 +1,8 @@
 package pta.analysis.solver
 
 import callgraph.Edge
+import pta.analysis.data.CSCallSite
+import pta.analysis.data.CSMethod
 import pta.analysis.data.Pointer
 import pta.element.CallSite
 import pta.element.Method
@@ -8,7 +10,7 @@ import pta.set.PointsToSet
 
 class WorkList {
     private val pointerEntries = ArrayDeque<Entry>()
-    private val callEdges = LinkedHashSet<Edge<CallSite, Method>>()
+    private val callEdges = LinkedHashSet<Edge<CSCallSite, CSMethod>>()
 
     val hasPointerEntries = pointerEntries.isNotEmpty()
     val hasCallEdges = callEdges.isNotEmpty()
@@ -24,9 +26,9 @@ class WorkList {
 
     fun pollPointerEntry() = pointerEntries.removeFirst()
 
-    fun addCallEdge(edge: Edge<CallSite, Method>) = callEdges.add(edge)
+    fun addCallEdge(edge: Edge<CSCallSite, CSMethod>) = callEdges.add(edge)
 
-    fun pollCallEdge(): Edge<CallSite, Method> {
+    fun pollCallEdge(): Edge<CSCallSite, CSMethod> {
         val edge = callEdges.iterator().next()
         callEdges.remove(edge)
         return edge

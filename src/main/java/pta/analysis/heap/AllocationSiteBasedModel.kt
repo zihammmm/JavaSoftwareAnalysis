@@ -1,15 +1,14 @@
 package pta.analysis.heap
 
-import pta.element.Method
 import pta.element.Obj
-import pta.element.Type
+import pta.statement.Allocation
 
 class AllocationSiteBasedModel: HeapModel {
-    private val objects = HashMap<Any, Obj>()
+    private val objects = HashMap<Allocation, Obj>()
 
-    override fun getObj(allocationSite: Any, type: Type, containerMethod: Method): Obj {
+    override fun getObj(allocationSite: Allocation): Obj {
         return objects.computeIfAbsent(allocationSite) {
-            ObjImpl(allocationSite, type, containerMethod)
+            it.obj
         }
     }
 }

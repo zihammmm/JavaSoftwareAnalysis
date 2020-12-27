@@ -3,10 +3,10 @@ package pta.analysis.data
 import pta.analysis.context.IContext
 import pta.element.CallSite
 
-data class CSCallsite constructor(
+data class CSCallSite constructor(
     val callSite: CallSite,
-    val iContext: IContext
-): AbstractCSElement(iContext) {
+    val context: IContext
+): AbstractCSElement(context) {
 
     override fun toString(): String {
         return "$context:$callSite"

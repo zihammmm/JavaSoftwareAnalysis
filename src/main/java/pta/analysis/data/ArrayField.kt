@@ -4,7 +4,7 @@ import pta.analysis.context.ObjectSensitive
 import pta.set.PointsToSet
 
 data class ArrayField constructor(
-    val array: ObjectSensitive
+    val array: CSObj
 ): Pointer {
     override var pointsToSet: PointsToSet? = null
 

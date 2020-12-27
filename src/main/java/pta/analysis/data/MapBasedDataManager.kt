@@ -1,66 +1,87 @@
 package pta.analysis.data
 
 import pta.analysis.context.IContext
-import pta.analysis.context.ObjectSensitive
 import pta.element.*
-import pta.set.HybridPointsToSet
 import pta.set.PointsToSetFactory
-import util.HybridArrayHashSet
+import util.HybridArrayHashMap
 
 class MapBasedDataManager constructor(
     private var setFactory: PointsToSetFactory
-): DataManager {
-    private val vars = HashMap<Variable, HashMap<IContext, CSVariable>>()
-    private val instanceFields = HashMap<CSObj, HashMap<Field, InstanceField>>()
+) : DataManager {
+    private val vars: MutableMap<Variable, MutableMap<IContext, CSVariable>> = HashMap()
+    private val instanceFields: MutableMap<CSObj, MutableMap<Field, InstanceField>> = HashMap()
     private val arrayFields = HashMap<CSObj, ArrayField>()
     private val staticFields = HashMap<Field, StaticField>()
-    private val objs = HashMap<Obj, HashMap<IContext, CSObj>>()
-    private val callSites = HashMap<CallSite, HashMap<IContext, CSCallsite>>()
-    private val methods = HashMap<Method, HashMap<IContext, CSMethod>>()
-
-    companion object {
-        private fun <R, K1, K2> getOrCreateCSElement(map: MutableMap<K1, MutableMap<K2, R>>, key1: K1, key2: K2, function: (K1, K2)->R): R {
-
-        }
-    }
+    private val objs: MutableMap<Obj, MutableMap<IContext, CSObj>> = HashMap()
+    private val callSites: MutableMap<CallSite, MutableMap<IContext, CSCallSite>> = HashMap()
+    private val methods: MutableMap<Method, MutableMap<IContext, CSMethod>> = HashMap()
 
     override fun setPointsToSetFactory(factory: PointsToSetFactory) {
         setFactory = factory
     }
 
+    private fun <P : Pointer> initializePointsToSet(pointer: P): P {
+        pointer.pointsToSet = setFactory.makePointsToSet()
+        return pointer
+    }
+
     override fun getCSVariable(context: IContext, variable: Variable): CSVariable {
-
+        return vars.getOrCreateCSElement(variable, context) { v, c ->
+            initializePointsToSet(CSVariable(v, c))
+        }
     }
 
-    override fun getInstanceField(obj: ObjectSensitive, field: Field): InstanceField {
-        TODO("Not yet implemented")
+    override fun getInstanceField(base: CSObj, field: Field): InstanceField {
+        return instanceFields.getOrCreateCSElement(base, field) { b, f ->
+            initializePointsToSet(InstanceField(b, f))
+        }
     }
 
-    override fun getArrayField(obj: ObjectSensitive): ArrayField {
-        TODO("Not yet implemented")
+    override fun getArrayField(array: CSObj): ArrayField {
+        return arrayFields.getOrPut(array) {
+            initializePointsToSet(ArrayField(array))
+        }
     }
 
     override fun getStaticField(field: Field): StaticField {
-        TODO("Not yet implemented")
+        return staticFields.getOrPut(field) {
+            initializePointsToSet(StaticField(field))
+        }
     }
 
     override fun getCSObj(context: IContext, obj: Obj): CSObj {
-        TODO("Not yet implemented")
+        return objs.getOrCreateCSElement(obj, context) {o, c ->
+            CSObj(o, c)
+        }
     }
 
-    override fun getCSCallsite(context: IContext, callsite: CallSite): CSCallsite {
-        TODO("Not yet implemented")
+    override fun getCSCallSite(context: IContext, callSite: CallSite): CSCallSite {
+        return callSites.getOrCreateCSElement(callSite, context) { cs, ct ->
+            CSCallSite(cs, ct)
+        }
     }
 
     override fun getCSMethod(context: IContext, method: Method): CSMethod {
-        TODO("Not yet implemented")
+        return methods.getOrCreateCSElement(method, context) {m, c ->
+            CSMethod(m, c)
+        }
     }
 
     override fun getCSVariables(): Sequence<CSVariable> {
-        TODO("Not yet implemented")
+        return vars.values.asSequence()
+            .flatMap { it.values }
     }
 
     override fun getInstanceFields(): Sequence<InstanceField> {
-        TODO("Not yet implemented")
+        return instanceFields.values.asSequence()
+            .flatMap { it.values }
+    }
+}
+
+fun <R, K1, K2> MutableMap<K1, MutableMap<K2, R>>.getOrCreateCSElement(key1: K1, key2: K2, function: (K1, K2) -> R): R {
+    return getOrPut(key1) {
+        HybridArrayHashMap()
+    }.getOrElse(key2) {
+        function(key1, key2)
     }
 }

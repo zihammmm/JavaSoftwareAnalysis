@@ -1,9 +1,8 @@
 package pta.analysis.heap
 
-import pta.element.Method
 import pta.element.Obj
-import pta.element.Type
+import pta.statement.Allocation
 
 interface HeapModel {
-    fun getObj(allocationSite: Any, type: Type, containerMethod: Method): Obj
+    fun getObj(allocationSite: Allocation): Obj
 }

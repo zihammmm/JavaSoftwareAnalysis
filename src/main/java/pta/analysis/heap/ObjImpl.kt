@@ -7,14 +7,14 @@ import pta.element.Type
 data class ObjImpl constructor(
     private val allocation: Any,
     private val type: Type,
-    private val containerMethod: Method?
+    private val containerMethod: Method
 ): Obj {
 
     override fun getType() = type
 
     override fun getAllocationSite() = allocation
 
-    override fun getContainerMethod(): Method? = containerMethod
+    override fun getContainerMethod(): Method = containerMethod
 
     override fun equals(other: Any?): Boolean {
         return if (this === other) {

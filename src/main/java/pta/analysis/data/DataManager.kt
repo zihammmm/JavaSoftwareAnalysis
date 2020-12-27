@@ -1,7 +1,6 @@
 package pta.analysis.data
 
 import pta.analysis.context.IContext
-import pta.analysis.context.ObjectSensitive
 import pta.element.*
 import pta.set.PointsToSetFactory
 
@@ -10,15 +9,15 @@ interface DataManager {
 
     fun getCSVariable(context: IContext, variable: Variable): CSVariable
 
-    fun getInstanceField(obj: ObjectSensitive, field: Field): InstanceField
+    fun getInstanceField(base: CSObj, field: Field): InstanceField
 
-    fun getArrayField(obj: ObjectSensitive): ArrayField
+    fun getArrayField(array: CSObj): ArrayField
 
     fun getStaticField(field: Field): StaticField
 
     fun getCSObj(context: IContext, obj: Obj): CSObj
 
-    fun getCSCallsite(context: IContext, callsite: CallSite): CSCallsite
+    fun getCSCallSite(context: IContext, callSite: CallSite): CSCallSite
 
     fun getCSMethod(context: IContext, method: Method): CSMethod
 

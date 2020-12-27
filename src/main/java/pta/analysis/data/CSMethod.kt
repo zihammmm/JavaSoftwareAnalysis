@@ -5,8 +5,8 @@ import pta.element.Method
 
 data class CSMethod constructor(
     val method: Method,
-    val iContext: IContext
-): AbstractCSElement(iContext) {
+    val context: IContext
+): AbstractCSElement(context) {
 
     override fun toString(): String {
         return "$method:$context"

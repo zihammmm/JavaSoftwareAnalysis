@@ -4,60 +4,43 @@ import pta.analysis.data.InstanceField
 import pta.analysis.data.Pointer
 import pta.element.Field
 import pta.element.Obj
+import pta.element.Type
 import pta.element.Variable
+import java.util.*
+import java.util.function.Function
+import java.util.stream.Stream
+import kotlin.collections.HashMap
+import kotlin.collections.HashSet
 
 class PointerFlowGraph {
-    /**
-     * Set of all pointers in this PFG
-     */
-    private val pointer = HashSet<AbstractPointer>()
+    val pointers = HashSet<Pointer>()
+    private val edges = HashMap<Pointer, HashSet<PointerFlowEdge>>()
+    private val graph = HashMap<Pointer, HashSet<Pointer>>()
 
-    /**
-     * Map from (Obj, Field) to InstanceField node
-     */
-    private val instanceField = HashMap<Obj, Map<Field, InstanceField>>()
-
-    /**
-     * Map from Variable to Var node
-     */
-    private val vars = HashMap<Variable, Var>()
-
-    /**
-     * Map from a pointer(node) to its successors
-     */
-    private val graph = HashMap<AbstractPointer, HashSet<AbstractPointer>>()
-
-    fun getVar(variable: Variable): Var {
-        return vars.getOrPut(variable) {
-            val ret = Var(variable)
-            pointer.add(ret)
-            ret
+    fun addEdge(from: Pointer, to: Pointer, kind: PointerFlowEdge.Kind, type: Type? = null): Boolean {
+        return if (!graph.getOrPut(from) {
+                HashSet()
+            }.contains(to)) {
+            graph[from]!!.add(to)
+            edges.getOrPut(from){
+                HashSet()
+            }.add(PointerFlowEdge(kind, from, to, type))
+            pointers.add(from)
+            pointers.add(to)
+            true
+        } else {
+            false
         }
     }
 
-    fun getPointer(): Set<AbstractPointer> {
-        return pointer
+    fun getOutEdgesOf(pointer: Pointer): Set<PointerFlowEdge> {
+        return edges.getOrDefault(pointer, emptySet())
     }
 
-    fun getInstanceField(obj: Obj, field: Field): InstanceField {
-        return instanceField.getOrPut(obj){
-            HashMap()
-        }.getOrElse(field) {
-            val f = InstanceField(obj, field)
-            pointer.add(f)
-            f
-        }
-    }
+    fun getEdges(): Iterator<PointerFlowEdge> {
+        return edges.values.asSequence()
+            .flatMap { it.asSequence() }
+            .iterator()
 
-    fun addEdge(from: Pointer, to: Pointer): Boolean {
-        return graph.getOrPut(from) {
-            HashSet()
-        }.add(to)
-    }
-
-    fun getSuccessorsOf(pointer: Pointer): Set<Pointer> = graph.getOrDefault(pointer, emptySet())
-
-    override fun toString(): String {
-        return "PointerFlowGraph {graph= $graph }"
     }
 }

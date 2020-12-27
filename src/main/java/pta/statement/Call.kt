@@ -3,7 +3,7 @@ package pta.statement
 import pta.element.CallSite
 import pta.element.Variable
 
-class Call constructor(
+data class Call constructor(
     val callSite: CallSite,
     val lhs: Variable?
 ): Statement {

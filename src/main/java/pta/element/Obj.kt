@@ -5,7 +5,7 @@ interface Obj {
 
     fun getAllocationSite(): Any
 
-    fun getContainerMethod(): Method?
+    fun getContainerMethod(): Method
 
     enum class Kind{
         NORMAL,

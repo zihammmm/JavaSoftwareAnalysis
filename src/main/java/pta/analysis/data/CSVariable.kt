@@ -6,8 +6,8 @@ import pta.set.PointsToSet
 
 data class CSVariable constructor(
     val variable: Variable,
-    val iContext: IContext
-): Pointer, AbstractCSElement(iContext) {
+    val context: IContext
+): Pointer, AbstractCSElement(context) {
 
     override var pointsToSet: PointsToSet? = null
 

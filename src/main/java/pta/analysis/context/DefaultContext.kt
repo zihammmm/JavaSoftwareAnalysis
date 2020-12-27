@@ -5,5 +5,6 @@ package pta.analysis.context
  * the depth is 0
  */
 object DefaultContext: IContext {
-
+    override val depth: Int
+        get() = 0
 }

@@ -2,7 +2,7 @@ package pta.statement
 
 import pta.element.Variable
 
-class Assign constructor(
+data class Assign constructor(
     val to: Variable,
     val from: Variable
 ): Statement {

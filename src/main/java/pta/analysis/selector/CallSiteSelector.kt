@@ -1,7 +1,7 @@
 package pta.analysis.selector
 
 import pta.analysis.context.*
-import pta.analysis.data.CSCallsite
+import pta.analysis.data.CSCallSite
 import pta.analysis.data.CSMethod
 import pta.analysis.data.CSObj
 import pta.element.Method
@@ -9,16 +9,16 @@ import pta.element.Method
 /**
  * k-callsite-sensitivity with heap context
  */
-class CallsiteSelector constructor(
+class CallSiteSelector constructor(
     private val k: Int
 ): ContextSelector {
-    private val callsiteSensitive = CallsiteSensitive(k)
+    private val callSiteSensitive = CallsiteSensitive(k)
 
-    override fun selectContext(callSite: CSCallsite, callee: Method): IContext {
+    override fun selectContext(callSite: CSCallSite, callee: Method): IContext {
         TODO("Not yet implemented")
     }
 
-    override fun selectContext(callSite: CSCallsite, recv: CSObj, callee: Method): IContext {
+    override fun selectContext(callSite: CSCallSite, recv: CSObj, callee: Method): IContext {
         TODO("Not yet implemented")
     }
 
