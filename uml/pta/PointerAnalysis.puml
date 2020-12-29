@@ -1,0 +1,11 @@
+@startuml
+
+interface PointerAnalysis
+interface IAnalysis
+class PointerAnalysisImpl
+
+PointerAnalysis <- PointerAnalysisImpl
+IAnalysis <- PointerAnalysis
+
+
+@enduml

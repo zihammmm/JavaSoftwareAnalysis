@@ -1,29 +1,35 @@
 package pta.analysis.solver
 
 import logger.Logger
+import pta.analysis.context.ContextInsensitiveSelector
 import pta.analysis.data.CSVariable
 import pta.analysis.data.InstanceField
 import pta.analysis.data.MapBasedDataManager
 import pta.analysis.data.Pointer
 import pta.analysis.heap.AllocationSiteBasedModel
+import pta.analysis.selector.*
 import pta.jimple.JimplePointerAnalysis
 import pta.jimple.JimpleProgramManager
 import pta.set.HybridPointsToSet
 import soot.SceneTransformer
 import sun.rmi.runtime.Log
+import util.AnalysisException
 import util.sequenceToString
 
 object PointerAnalysisTransformer : SceneTransformer() {
     var output = true
     private const val TAG = "PointerAnalysis"
 
+
     override fun internalTransform(p0: String?, p1: MutableMap<String, String>?) {
         val factory = HybridPointsToSet.Factory()
+        val contextSelector = SelectorFactory.getContextSelector(p1?.get("cs"), p1?.get("k")?.toInt() ?: 0)
         val pta = PointerAnalysisImpl(
             AllocationSiteBasedModel(),
             JimpleProgramManager(),
             factory,
-            MapBasedDataManager(factory)
+            MapBasedDataManager(factory),
+            contextSelector
         )
         pta.solve()
         JimplePointerAnalysis.setPointerAnalysis(pta)

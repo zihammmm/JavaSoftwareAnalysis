@@ -1,0 +1,12 @@
+@startuml
+
+interface IContext
+abstract class Context<T>
+class DefaultContext
+class CallSiteSensitive
+class ObjectSensitive
+class TypeSensitive
+interface ContextSelector
+class ContextInsensitiveSelector
+
+@enduml

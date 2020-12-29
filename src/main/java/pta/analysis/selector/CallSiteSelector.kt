@@ -4,26 +4,51 @@ import pta.analysis.context.*
 import pta.analysis.data.CSCallSite
 import pta.analysis.data.CSMethod
 import pta.analysis.data.CSObj
+import pta.element.CallSite
 import pta.element.Method
 
 /**
- * k-callsite-sensitivity with heap context
+ * k-call-site-sensitivity with k-1 heap context
  */
 class CallSiteSelector constructor(
     private val k: Int
 ): ContextSelector {
-    private val callSiteSensitive = CallsiteSensitive(k)
 
     override fun selectContext(callSite: CSCallSite, callee: Method): IContext {
-        TODO("Not yet implemented")
+        val context = when(callSite.context.depth) {
+            0 -> {
+                Context<CallSite>(k)
+            }
+            else -> {
+                Context<CallSite>(callSite.context)
+            }
+        }
+        context.addElement(callSite.callSite)
+        return context
     }
 
     override fun selectContext(callSite: CSCallSite, recv: CSObj, callee: Method): IContext {
-        TODO("Not yet implemented")
+        val context = when(callSite.context.depth) {
+            0 -> {
+                Context<CallSite>(k)
+            }
+            else -> {
+                Context<CallSite>(callSite.context)
+            }
+        }
+        context.addElement(callSite.callSite)
+        return context
     }
 
     override fun selectHeapContext(method: CSMethod, allocationSite: Any): IContext {
-        return getDefaultContext()
+        val context = method.context
+        return if (context.depth > 1) {
+            val newContext = Context<CallSite>(context.depth - 1)
+            newContext.addElement(context)
+            newContext
+        } else {
+            context
+        }
     }
 
 }

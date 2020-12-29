@@ -1,6 +1,7 @@
 package util.resultchecker
 
 import dataflow.analysis.constprop.main
+import pta.analysis.solver.PointerAnalysisTransformer
 import soot.G
 import soot.Unit
 import soot.UnitPatchingChain
@@ -20,6 +21,7 @@ abstract class AbstractResultChecker<K, V>{
 
     fun check(args: Array<String>, path: String): Set<String> {
         readExpectedResult(Paths.get(path))
+        PointerAnalysisTransformer.output = false
         G.reset()
         main(args)
         return mismatches

@@ -14,6 +14,12 @@ open class Context<T> constructor(
     override val depth: Int
         get() = elementList.size
 
+    constructor(context: IContext) : this(context.depth) {
+        if (context is Context<*>) {
+            addElement(context)
+        }
+    }
+
     fun element(index: Int): T {
         if (index < depth) {
             return elementList[index]
@@ -27,9 +33,22 @@ open class Context<T> constructor(
         if(capability == 0) {
             throw IllegalStateException("The Capability is 0!")
         }
-        while (depth < capability) {
+        while (depth >= capability) {
             elementList.removeFirst();
         }
         return elementList.add(element)
     }
+
+    fun addElement(context: IContext): Boolean {
+        if (context !is Context<*>) {
+            return false
+        }
+        var changed = false
+        for (element in context.elementList) {
+            changed = changed || addElement(element as T)
+        }
+        return changed
+    }
+
+    fun containsElement(element: T): Boolean = elementList.contains(element)
 }
