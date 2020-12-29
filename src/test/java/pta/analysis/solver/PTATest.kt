@@ -8,7 +8,7 @@ internal class PTATest {
     private val checker = PAResultChecker
 
     private fun testPTA(className: String, options: Array<String>) {
-
+        test(checker, className, "pta", options)
     }
 
     @Test

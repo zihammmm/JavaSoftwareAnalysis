@@ -152,6 +152,10 @@ class ElementManager {
             }
         }
 
+        private fun createObject(alloc: AssignStmt, container: JimpleMethod): JimpleObj {
+            return JimpleObj(alloc, getType(alloc.rightOp.type), container)
+        }
+
         fun build(method: JimpleMethod, stmt: AssignStmt) {
             val left = stmt.leftOp
             val right = stmt.rightOp
@@ -165,7 +169,7 @@ class ElementManager {
                 } else {
                     lhs?.let {
                         when(right) {
-                            is NewExpr -> method.addStatement(Allocation(it, stmt, this@ElementManager.getType(right.type)))
+                            is NewExpr -> method.addStatement(Allocation(it, createObject(stmt, method)))
                             is Local -> method.addStatement(Assign(it, this@ElementManager.getVariable(right, method)!!))
                             is InstanceFieldRef -> {
                                 val base = this@ElementManager.getVariable(right.base, method)!!

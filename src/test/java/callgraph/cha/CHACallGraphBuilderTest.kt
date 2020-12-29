@@ -9,21 +9,21 @@ internal class CHACallGraphBuilderTest {
 
     @Test
     fun testStaticCall() {
-        test(resultCheck, "StaticCall", "CHA")
+        test(resultCheck, "StaticCall", "CHA", emptyArray())
     }
 
     @Test
     fun testSpecialCall() {
-        test(resultCheck, "SpecialCall", "CHA")
+        test(resultCheck, "SpecialCall", "CHA", emptyArray())
     }
 
     @Test
     fun testVirtualCall() {
-        test(resultCheck, "VirtualCall", "CHA")
+        test(resultCheck, "VirtualCall", "CHA", emptyArray())
     }
 
     @Test
     fun testInterface() {
-        test(resultCheck, "Interface", "CHA")
+        test(resultCheck, "Interface", "CHA", emptyArray())
     }
 }
